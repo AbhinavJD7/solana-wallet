@@ -5,10 +5,10 @@ import {generateMnemonic} from "bip39"
 import SolanaWallet from "./solanaWallet";
 
 export default function WalletPage(){
-  const [mnemonic , setMnemonics] = useState<string>("");
+  const [mnemonic , setMnemonic] = useState<string>("");
   const handleGenerate = () => {
       const mn  = generateMnemonic() // Uses bip39 to create the 12 words
-      setMnemonics(mn);
+      setMnemonic(mn);
   };
   return (
     <main className="max-w-4xl mx-auto p-8">
@@ -34,7 +34,7 @@ export default function WalletPage(){
               {mnemonic.split(" ").map((word, index) => ( 
                 <div key={index} className="bg-white p-3 rounded-md border border-gray-300 flex gap-2">
                   <span className="text-gray-400">{index + 1}.</span>
-                  <span className="font-mono font-medium">{ " "+ word}</span>
+                  <span className="font-mono font-medium text-gray-900">{ " "+ word}</span>
                 </div>
               ))}
             </div>
