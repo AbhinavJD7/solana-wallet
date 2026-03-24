@@ -1,14 +1,31 @@
 "use client";
-import { useState } from "react"; //we use "use client" and useState to keep track of the phrase
+import { useState, useEffect } from "react"; //we use "use client" and useState to keep track of the phrase
                                   // as when then page re-renders and we are using normal variables instead of useState then the value refreshes to initial value
 import {generateMnemonic} from "bip39"  
 import SolanaWallet from "./solanaWallet";
 
 export default function WalletPage(){
-  const [mnemonic , setMnemonic] = useState<string>("");
+  // Initialize to empty string (safe for both server and client)
+  const [mnemonic , setMnemonics] = useState<string>("");
+
+  // Load from localStorage after hydration (safe, no cascading renders)
+  useEffect(() => {
+    const savedMnemonic = localStorage.getItem("storedMnemonic");
+    if (savedMnemonic) {
+      // Defer setState to after effect completes (prevents warning)
+      setTimeout(() => setMnemonics(savedMnemonic), 0);
+    }
+  }, []);
+
+  // Save mnemonic whenever it changes
+  useEffect(() => {
+    if (mnemonic) {
+      localStorage.setItem("storedMnemonic", mnemonic);
+    }
+  }, [mnemonic]); // Runs every time mnemonic changes
   const handleGenerate = () => {
       const mn  = generateMnemonic() // Uses bip39 to create the 12 words
-      setMnemonic(mn);
+      setMnemonics(mn);
   };
   return (
     <main className="max-w-4xl mx-auto p-8">
@@ -21,7 +38,14 @@ export default function WalletPage(){
         >
           {mnemonic ? "Regenerate Seed Phrase" : "Generate Seed Phrase"}
         </button>
-
+         <button
+          onClick={() => {
+           localStorage.clear();
+           setMnemonics("");
+           window.location.reload(); // Refresh page to reset everything
+          }}
+           className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition"
+           > Clear All Data</button>
         {mnemonic && (
           <div className="bg-gray-100 p-6 rounded-xl border border-gray-200 shadow-inner">
             <h2 className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider">
